@@ -240,6 +240,77 @@ describe("grok_local execute", () => {
     expect(seenArgs[flagIndex + 1]).toBe("bypassPermissions");
   });
 
+  it("overrides explicit dontAsk when alwaysApprove is enabled", async () => {
+    const root = await makeTempRoot();
+    runProcessMock.mockImplementation(async (_runId, _target, _command, args) => {
+      expect(args).toEqual(expect.arrayContaining(["--permission-mode", "bypassPermissions", "--always-approve"]));
+      expect(args).not.toContain("dontAsk");
+      return {
+        exitCode: 0,
+        signal: null,
+        timedOut: false,
+        stdout: [
+          JSON.stringify({ type: "text", data: "ok" }),
+          JSON.stringify({ type: "end", stopReason: "EndTurn", sessionId: "sess-1", requestId: "req-1" }),
+        ].join("\n"),
+        stderr: "",
+      };
+    });
+
+    const result = await execute({
+      runId: "run-override-dontask",
+      agent: {
+        id: "agent-1",
+        companyId: "company-1",
+        name: "Grok Agent",
+        adapterType: "grok_local",
+        adapterConfig: {},
+      },
+      runtime: { sessionId: null, sessionParams: null, sessionDisplayId: null, taskKey: null },
+      config: { cwd: root, permissionMode: "dontAsk", alwaysApprove: true },
+      context: {},
+      authToken: "run-token",
+      onLog: async () => {},
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.errorMessage).toBeNull();
+  });
+
+  it("fails the run when Grok exits 0 with stopReason Cancelled", async () => {
+    const root = await makeTempRoot();
+    runProcessMock.mockImplementation(async () => ({
+      exitCode: 0,
+      signal: null,
+      timedOut: false,
+      stdout: [
+        JSON.stringify({ type: "text", data: "Loading skill next." }),
+        JSON.stringify({ type: "end", stopReason: "Cancelled", sessionId: "sess-c", requestId: "req-c" }),
+      ].join("\n"),
+      stderr: "",
+    }));
+
+    const result = await execute({
+      runId: "run-cancelled",
+      agent: {
+        id: "agent-1",
+        companyId: "company-1",
+        name: "Grok Agent",
+        adapterType: "grok_local",
+        adapterConfig: {},
+      },
+      runtime: { sessionId: null, sessionParams: null, sessionDisplayId: null, taskKey: null },
+      config: { cwd: root },
+      context: {},
+      authToken: "run-token",
+      onLog: async () => {},
+    });
+
+    expect(result.exitCode).toBe(1);
+    expect(result.errorMessage).toMatch(/stopReason=Cancelled/i);
+    expect(result.sessionId).toBe("sess-c");
+  });
+
   it("cleans up staged assets when setup fails before the Grok process starts", async () => {
     const root = await makeTempRoot();
     const instructionsPath = path.join(root, "managed", "AGENTS.md");
