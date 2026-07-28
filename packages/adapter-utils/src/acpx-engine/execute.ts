@@ -2579,6 +2579,26 @@ async function emitRuntimeEvent(
   }
 }
 
+/**
+ * Build the short run summary that Paperclip may auto-post as an issue comment
+ * when the agent leaves no comment of its own.
+ *
+ * Prefer the last non-empty *output* segment after a tool call. Intermediate
+ * "let me check…" narration between tools must not become a 50k-char dump.
+ * Thought-stream text is never included (callers must not push it into segments).
+ */
+export function buildAcpxRunSummary(input: {
+  outputSegments: string[];
+  fallback?: string | null;
+}): string {
+  for (let i = input.outputSegments.length - 1; i >= 0; i -= 1) {
+    const text = (input.outputSegments[i] ?? "").trim();
+    if (text) return text;
+  }
+  const fallback = (input.fallback ?? "").trim();
+  return fallback;
+}
+
 function resultErrorMessage(result: AcpRuntimeTurnResult): string | null {
   if (result.status !== "failed") return null;
   return result.error.message;
@@ -3877,12 +3897,17 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
       // controller and never rejects; it returns a `TurnCompletion`. The step
       // bodies below record the external result for the coordinator to reproduce.
       const runTurn = async (_ready: StartupReady): Promise<TurnCompletion> => {
+<<<<<<< HEAD
       // Summary accumulation, per the adapter-declared strategy. "full" (the
       // default) collects every text delta exactly as before.
       // "lastOutputSegment" collects output text only (never thought stream),
       // segmented on tool starts so multi-step narration is not glued into one
       // auto-comment dump.
       const textParts: string[] = [];
+=======
+      // Output text only (never thought stream). Segment on tool starts so
+      // multi-step narration is not glued into one auto-comment dump.
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
       const outputSegments: string[] = [];
       let currentOutputChunk: string[] = [];
       const flushOutputSegment = () => {
@@ -3993,9 +4018,13 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
         const toolTitles = new Map<string, string>();
         for await (const event of turn.events) {
           if (event.type === "text_delta") {
+<<<<<<< HEAD
             if (prepared.summaryStrategy === "full") {
               textParts.push(event.text);
             } else if (event.stream !== "thought") {
+=======
+            if (event.stream !== "thought") {
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
               currentOutputChunk.push(event.text);
             }
           } else if (event.type === "tool_call" && event.status === "pending") {
@@ -4088,6 +4117,7 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
               ? { cumulativeCostUsd: turnUsage.cumulativeCostUsd }
               : {}),
           },
+<<<<<<< HEAD
           summary:
             prepared.summaryStrategy === "lastOutputSegment"
               ? buildAcpxRunSummary({
@@ -4095,6 +4125,12 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
                   fallback: terminalStopReason || terminal.status,
                 })
               : textParts.join("").trim() || terminalStopReason || terminal.status,
+=======
+          summary: buildAcpxRunSummary({
+            outputSegments,
+            fallback: terminalStopReason || terminal.status,
+          }),
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
           clearSession,
         };
         // The turn phase finished. A completed, non-timed-out turn is `ok`; every

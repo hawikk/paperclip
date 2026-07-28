@@ -617,6 +617,7 @@ describe("shared ACPX engine runtime behavior", () => {
     } as never);
 
     expect(result.exitCode).toBe(0);
+    expect(result.summary).toBe("streamed hello");
     expect(logs).toContainEqual({
       stream: "stdout",
       text: `${JSON.stringify({
@@ -628,6 +629,7 @@ describe("shared ACPX engine runtime behavior", () => {
     });
   });
 
+<<<<<<< HEAD
   it("pins the existing summary and tool-event behavior when no engine knobs are set", async () => {
     const root = await makeTempRoot();
     const stateDir = path.join(root, "state");
@@ -733,6 +735,9 @@ describe("shared ACPX engine runtime behavior", () => {
   });
 
   it("summarizes only the final output segment when the adapter sets summaryStrategy", async () => {
+=======
+  it("summarizes only the final output segment after tools, excluding thought stream", async () => {
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
     const root = await makeTempRoot();
     const stateDir = path.join(root, "state");
     const execute = createAcpxEngineExecutor({
@@ -766,6 +771,7 @@ describe("shared ACPX engine runtime behavior", () => {
             };
             yield {
               type: "tool_call",
+<<<<<<< HEAD
               text: 'tool call (in_progress): {"command":"',
               title: "tool call",
               status: "in_progress",
@@ -776,6 +782,10 @@ describe("shared ACPX engine runtime behavior", () => {
               type: "tool_call",
               text: "tool call (completed): apps",
               title: "tool call",
+=======
+              text: "Bash (completed)",
+              title: "Bash",
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
               status: "completed",
               toolCallId: "tool-1",
               tag: "tool_call_update",
@@ -799,12 +809,16 @@ describe("shared ACPX engine runtime behavior", () => {
       runId: "run-summary-last-segment",
       agent: { id: "agent-1", companyId: "company-1" },
       runtime: {},
+<<<<<<< HEAD
       config: {
         agent: "custom",
         agentCommand: "node ./fake-acp.js",
         stateDir,
         summaryStrategy: "lastOutputSegment",
       },
+=======
+      config: { agent: "custom", agentCommand: "node ./fake-acp.js", stateDir },
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
       context: {},
       onLog: async () => {},
       onMeta: async () => {},
@@ -827,7 +841,11 @@ describe("shared ACPX engine runtime behavior", () => {
     expect(buildAcpxRunSummary({ outputSegments: ["", "  "], fallback: "end_turn" })).toBe("end_turn");
   });
 
+<<<<<<< HEAD
   it("coalesces placeholder-title tool updates when the adapter opts in", async () => {
+=======
+  it("coalesces streamed tool-call argument updates that carry only the placeholder title", async () => {
+>>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
     const root = await makeTempRoot();
     const stateDir = path.join(root, "state");
     const logs: Array<{ stream: string; text: string }> = [];
