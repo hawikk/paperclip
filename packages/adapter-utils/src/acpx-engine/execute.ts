@@ -2486,14 +2486,10 @@ export function buildAcpxRunSummary(input: {
 // acpx substitutes a literal "tool call" title when an ACP tool_call_update
 // omits one, which would persist a generic name over the real one ("Terminal",
 // "Read", …) in the stored run log. Remember each call's real title so update
-<<<<<<< HEAD
 // lines keep the name durably. Some ACP backends also stream partial tool
 // arguments as one in-progress update per token under this placeholder;
 // adapters that opt into coalescePlaceholderToolUpdates in their acpx config
 // have those updates coalesced until a real title is available.
-=======
-// lines keep the name durably.
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
 const GENERIC_ACP_TOOL_TITLE = "tool call";
 
 async function emitRuntimeEvent(
@@ -2512,7 +2508,6 @@ async function emitRuntimeEvent(
     return;
   }
   if (event.type === "tool_call") {
-<<<<<<< HEAD
     // Coalesce token-by-token argument streaming for adapters that opt in via
     // their acpx config: skip in-progress updates that still carry only the
     // unresolved placeholder title. Backends that stream tool arguments
@@ -2529,8 +2524,6 @@ async function emitRuntimeEvent(
     ) {
       return;
     }
-=======
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
     const eventRecord = event as Record<string, unknown>;
     const toolInput = eventRecord.input;
     let name = event.title ?? "acp_tool";
@@ -3884,18 +3877,12 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
       // controller and never rejects; it returns a `TurnCompletion`. The step
       // bodies below record the external result for the coordinator to reproduce.
       const runTurn = async (_ready: StartupReady): Promise<TurnCompletion> => {
-<<<<<<< HEAD
-<<<<<<< HEAD
       // Summary accumulation, per the adapter-declared strategy. "full" (the
       // default) collects every text delta exactly as before.
       // "lastOutputSegment" collects output text only (never thought stream),
       // segmented on tool starts so multi-step narration is not glued into one
       // auto-comment dump.
       const textParts: string[] = [];
-=======
-      // Output text only (never thought stream). Segment on tool starts so
-      // multi-step narration is not glued into one auto-comment dump.
->>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
       const outputSegments: string[] = [];
       let currentOutputChunk: string[] = [];
       const flushOutputSegment = () => {
@@ -3903,9 +3890,6 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
         outputSegments.push(currentOutputChunk.join(""));
         currentOutputChunk = [];
       };
-=======
-      const textParts: string[] = [];
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
       let eventBreakdown: AcpRuntimeUsageBreakdown | null = null;
       let eventCostUsd: number | null = null;
       // The turn-local state the sequence steps share. `promptBuild` sets the
@@ -4008,29 +3992,22 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
         const turn = activeTurn as AcpRuntimeTurn;
         const toolTitles = new Map<string, string>();
         for await (const event of turn.events) {
-<<<<<<< HEAD
           if (event.type === "text_delta") {
-<<<<<<< HEAD
             if (prepared.summaryStrategy === "full") {
               textParts.push(event.text);
             } else if (event.stream !== "thought") {
-=======
-            if (event.stream !== "thought") {
->>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
               currentOutputChunk.push(event.text);
             }
           } else if (event.type === "tool_call" && event.status === "pending") {
             flushOutputSegment();
           }
-=======
-          if (event.type === "text_delta") textParts.push(event.text);
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
           if (event.type === "status" && event.tag === "usage_update") {
             eventBreakdown = event.breakdown ?? eventBreakdown;
             eventCostUsd = usdCostAmount(event.cost) ?? eventCostUsd;
           }
           await emitRuntimeEvent(ctx, event, toolTitles, prepared.coalescePlaceholderToolUpdates);
         }
+        flushOutputSegment();
         return await turn.result;
       };
       const stepTurnFinalize = async (
@@ -4111,8 +4088,6 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
               ? { cumulativeCostUsd: turnUsage.cumulativeCostUsd }
               : {}),
           },
-<<<<<<< HEAD
-<<<<<<< HEAD
           summary:
             prepared.summaryStrategy === "lastOutputSegment"
               ? buildAcpxRunSummary({
@@ -4120,15 +4095,6 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
                   fallback: terminalStopReason || terminal.status,
                 })
               : textParts.join("").trim() || terminalStopReason || terminal.status,
-=======
-          summary: buildAcpxRunSummary({
-            outputSegments,
-            fallback: terminalStopReason || terminal.status,
-          }),
->>>>>>> 24788111a (fix(kimi/acpx): stop auto-posting intermediate assistant narration)
-=======
-          summary: textParts.join("").trim() || terminalStopReason || terminal.status,
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
           clearSession,
         };
         // The turn phase finished. A completed, non-timed-out turn is `ok`; every

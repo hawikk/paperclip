@@ -1084,7 +1084,6 @@ describe("buildIssueChatMessages", () => {
     }));
   });
 
-<<<<<<< HEAD
   it("honors a wider transcript window declared by an adapter's UI module", () => {
     // Capability path: an adapter (built-in or plugin) declares
     // transcriptPresentation on its UI module; shared code resolves it via the
@@ -1163,70 +1162,6 @@ describe("buildIssueChatMessages", () => {
     } finally {
       unregisterUIAdapter("verbose_test_local");
     }
-=======
-  it("keeps a wider transcript window for kimi_local runs", () => {
-    const isoAt = (baseMs: number, offsetSeconds: number) =>
-      new Date(baseMs + offsetSeconds * 1000).toISOString();
-    const baseMs = Date.parse("2026-04-06T12:00:00.000Z");
-    // 90 renderable entries: over the default 30-entry window (which the test
-    // above pins for other adapters), but under the 400-entry window that
-    // verbose streaming backends get so already-rendered content is not
-    // dropped off the front mid-run.
-    const transcript = [
-      ...Array.from({ length: 9 }, (_, index) => ({
-        kind: "assistant" as const,
-        ts: isoAt(baseMs, index),
-        text: `Older update ${index + 1}`,
-      })),
-      {
-        kind: "tool_call" as const,
-        ts: isoAt(baseMs, 9),
-        name: "search",
-        toolUseId: "tool-keep",
-        input: { query: "issue chat virtualization" },
-      },
-      ...Array.from({ length: 79 }, (_, index) => ({
-        kind: "assistant" as const,
-        ts: isoAt(baseMs, 10 + index),
-        text: `Recent update ${index + 1}`,
-      })),
-      {
-        kind: "tool_result" as const,
-        ts: isoAt(baseMs, 89),
-        toolUseId: "tool-keep",
-        content: "search completed",
-        isError: false,
-      },
-    ];
-
-    const messages = buildIssueChatMessages({
-      comments: [],
-      timelineEvents: [],
-      linkedRuns: [
-        {
-          runId: "run-history-kimi",
-          status: "succeeded",
-          agentId: "agent-1",
-          agentName: "KimiCoder",
-          adapterType: "kimi_local",
-          createdAt: new Date("2026-04-06T12:00:00.000Z"),
-          startedAt: new Date("2026-04-06T12:00:00.000Z"),
-          finishedAt: new Date("2026-04-06T12:03:00.000Z"),
-        },
-      ],
-      liveRuns: [],
-      transcriptsByRunId: new Map([["run-history-kimi", transcript]]),
-      hasOutputForRun: (runId) => runId === "run-history-kimi",
-      currentUserId: "user-1",
-    });
-
-    expect(messages).toHaveLength(1);
-    const textParts = messages[0]?.content
-      .filter((part): part is { type: "text"; text: string } => part.type === "text")
-      .map((part) => part.text) ?? [];
-    expect(textParts.join("\n")).toContain("Older update 1");
-    expect(textParts.join("\n")).toContain("Recent update 79");
->>>>>>> 2494f7cda (feat(kimi): declare verbose-backend transcript and engine behavior via registries)
   });
 
   it("keeps the same assistant message id when a live run becomes a cancelled historical run", () => {

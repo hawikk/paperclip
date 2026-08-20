@@ -1086,10 +1086,6 @@ function IssueChatChainOfThought({
       </button>
       {expanded && hasContent ? (
         <div className="space-y-1 py-1">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2494f7cda (feat(kimi): declare verbose-backend transcript and engine behavior via registries)
           {isActive && isVerboseStreamingBackend ? (
             <>
               {allReasoningText ? <IssueChatVerboseLiveReasoningPart text={allReasoningText} /> : null}
@@ -1105,12 +1101,6 @@ function IssueChatChainOfThought({
               ))}
             </>
           ) : isActive ? (
-<<<<<<< HEAD
-=======
-          {isActive ? (
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
-=======
->>>>>>> 2494f7cda (feat(kimi): declare verbose-backend transcript and engine behavior via registries)
             <>
               {allReasoningText ? <IssueChatReasoningPart text={allReasoningText} /> : null}
               {toolParts.length > 0 ? <IssueChatRollingToolPart toolParts={toolParts} /> : null}
@@ -1136,10 +1126,6 @@ function IssueChatChainOfThought({
   );
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2494f7cda (feat(kimi): declare verbose-backend transcript and engine behavior via registries)
 // Live reasoning for verbose streaming backends: the one-line
 // ticker cannot keep up with token-level delta volume, so show the full
 // reasoning in a scrollable box that auto-follows the newest line unless the
@@ -1160,28 +1146,6 @@ function IssueChatVerboseLiveReasoningPart({ text }: { text: string }) {
   if (lines.length <= 1) {
     return <IssueChatReasoningPart text={text} />;
   }
-<<<<<<< HEAD
-=======
-function IssueChatReasoningPart({ text }: { text: string }) {
-  const lines = text.split("\n").filter((l) => l.trim());
-  const lastLine = lines[lines.length - 1] ?? text.slice(-200);
-  const prevRef = useRef(lastLine);
-  const [ticker, setTicker] = useState<{
-    key: number;
-    current: string;
-    exiting: string | null;
-  }>({ key: 0, current: lastLine, exiting: null });
-
-  useEffect(() => {
-    if (lastLine !== prevRef.current) {
-      const prev = prevRef.current;
-      prevRef.current = lastLine;
-      setTicker((t) => ({ key: t.key + 1, current: lastLine, exiting: prev }));
-    }
-  }, [lastLine]);
->>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
-=======
->>>>>>> 2494f7cda (feat(kimi): declare verbose-backend transcript and engine behavior via registries)
 
   return (
     <div className="flex gap-2 px-1">
