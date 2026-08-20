@@ -22,7 +22,7 @@ The `kimi_local` adapter runs the Kimi Code CLI (`kimi`) locally. It has two exe
 | `model` | string | No | Kimi model alias (`provider/model`). Defaults to `kimi-code/kimi-for-coding`. When empty, Kimi uses `default_model` from its own `config.toml`. |
 | `promptTemplate` | string | No | Prompt used for all runs |
 | `instructionsFilePath` | string | No | Markdown instructions file prepended to the prompt. Sibling files in the same directory (`HEARTBEAT.md`, `SOUL.md`, `TOOLS.md`) are made readable via `--add-dir` on local runs. |
-| `effort` | string | No | Thinking effort (`low` \| `medium` \| `high` \| `max`). Forwarded as `KIMI_MODEL_THINKING_EFFORT` for effort-capable models (currently `kimi-code/k3`); `medium` maps to `high` since Kimi has no medium tier. Ignored for models without `support_efforts`. |
+| `effort` | string | No | Thinking effort (`low` \| `medium` \| `high` \| `max`). **CLI lane only**: forwarded as `KIMI_MODEL_THINKING_EFFORT` for effort-capable models (currently `kimi-code/k3`); `medium` maps to `high` since Kimi has no medium tier. Ignored for models without `support_efforts`, and not forwarded on the default ACP engine lane — pin `engine: cli` when effort control matters. |
 | `command` | string | No | CLI command override. Defaults to `kimi`. |
 | `extraArgs` | string[] | No | Additional CLI arguments appended to every run |
 | `env` | object | No | Environment variables (supports secret refs) |
@@ -51,7 +51,7 @@ When `instructionsFilePath` points at a managed instruction bundle, the entry fi
 
 ## Thinking Effort
 
-The `effort` field is forwarded as the `KIMI_MODEL_THINKING_EFFORT` operational override, which applies to Kimi providers including managed OAuth models. Kimi has no per-invocation effort flag and no `medium` tier, so `medium` is mapped to `high`; `low`, `high`, and `max` pass through. Effort is only sent for models that advertise `support_efforts` (currently `kimi-code/k3`) to avoid provider rejections; extend `EFFORT_CAPABLE_MODELS` in the adapter as more models gain support.
+The `effort` field applies to the **headless CLI lane only** (`engine: cli`, or the automatic fallback when ACP prerequisites fail). On the default ACP engine lane it is currently **not forwarded**: Kimi's ACP interface exposes a separate `thinking` config option that Paperclip does not wire yet, so an effort configured on an ACP-lane agent leaves Kimi's own default behavior in place. Pin `engine: cli` when thinking-effort control matters. On the CLI lane, `effort` is forwarded as the `KIMI_MODEL_THINKING_EFFORT` operational override, which applies to Kimi providers including managed OAuth models. Kimi has no per-invocation effort flag and no `medium` tier, so `medium` is mapped to `high`; `low`, `high`, and `max` pass through. Effort is only sent for models that advertise `support_efforts` (currently `kimi-code/k3`) to avoid provider rejections; extend `EFFORT_CAPABLE_MODELS` in the adapter as more models gain support.
 
 ## Session Persistence
 

@@ -65,7 +65,7 @@ Core fields:
 - instructionsFilePath (string, optional): absolute path to a markdown instructions file prepended to the run prompt. Sibling files in the same directory (HEARTBEAT.md, SOUL.md, TOOLS.md) are made readable via --add-dir for local runs.
 - promptTemplate (string, optional): run prompt template
 - model (string, optional): Kimi model alias (provider/model). Defaults to kimi-code/kimi-for-coding.
-- effort (string, optional): thinking effort (low | medium | high | max). Forwarded as KIMI_MODEL_THINKING_EFFORT for effort-capable models (currently kimi-code/k3); "medium" maps to "high" since Kimi has no medium tier. Ignored for models without support_efforts.
+- effort (string, optional): thinking effort (low | medium | high | max). CLI lane only (engine=cli or the automatic fallback): forwarded as KIMI_MODEL_THINKING_EFFORT for effort-capable models (currently kimi-code/k3); "medium" maps to "high" since Kimi has no medium tier. Ignored for models without support_efforts, and NOT forwarded on the default ACP engine lane (Kimi ACP exposes a separate "thinking" option that is not wired yet) — pin engine=cli when effort control matters.
 - command (string, optional): defaults to "kimi"
 - extraArgs (string[], optional): additional CLI args
 - env (object, optional): KEY=VALUE environment variables
