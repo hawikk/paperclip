@@ -52,6 +52,12 @@ describe("buildKimiAcpConfig", () => {
     expect("effort" in out).toBe(false);
     expect("thinkingEffort" in out).toBe(false);
   });
+
+  it("opts into the shared engine's verbose-backend handling", () => {
+    const out = buildKimiAcpConfig({ command: "kimi" });
+    expect(out.summaryStrategy).toBe("lastOutputSegment");
+    expect(out.coalescePlaceholderToolUpdates).toBe(true);
+  });
 });
 
 describe("nodeVersionMeetsKimiAcpMinimum", () => {

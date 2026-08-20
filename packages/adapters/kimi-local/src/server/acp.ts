@@ -122,6 +122,13 @@ export function buildKimiAcpConfig(config: Record<string, unknown>): Record<stri
   // lane via KIMI_MODEL_THINKING_EFFORT.
   delete next.effort;
   delete next.thinkingEffort;
+  // Kimi streams ~16k text deltas and one tool_call update per argument token
+  // per run (~50x a comparable Claude run). Opt into the shared engine's
+  // verbose-backend handling: the auto-posted run summary becomes the last
+  // output segment instead of the full narration dump, and placeholder-titled
+  // in-progress tool updates are coalesced out of the run log.
+  next.summaryStrategy = "lastOutputSegment";
+  next.coalescePlaceholderToolUpdates = true;
   return next;
 }
 
