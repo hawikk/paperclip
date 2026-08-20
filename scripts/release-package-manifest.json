@@ -47,7 +47,7 @@
   {
     "dir": "packages/adapters/kimi-local",
     "name": "@paperclipai/adapter-kimi-local",
-    "publishFromCi": false
+    "publishFromCi": true
   },
   {
     "dir": "packages/adapters/opencode-local",
