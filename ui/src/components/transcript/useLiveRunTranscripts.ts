@@ -92,9 +92,6 @@ export function resolveInitialLogOffset(run: RunTranscriptSource, limitBytes: nu
 export function useLiveRunTranscripts({
   runs,
   companyId,
-  // Full task views omit maxChunksPerRun and keep a 2MB byte budget instead.
-  // ACPX backends (especially Kimi) emit one log line per token, so a small
-  // chunk window trims already-rendered output mid-sentence.
   maxChunksPerRun,
   maxBytesPerRun = TASK_VIEW_MAX_BYTES_PER_RUN,
   logPollIntervalMs = LOG_POLL_INTERVAL_MS,

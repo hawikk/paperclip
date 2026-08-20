@@ -26,7 +26,6 @@ vi.mock("@paperclipai/adapter-utils/execution-target", async (importActual) => {
   };
 });
 import {
-  buildAcpxRunSummary,
   createAcpxEngineExecutor,
   findAncestorBin,
   geminiVersionSupportsNativeAcpFlag,
@@ -617,7 +616,6 @@ describe("shared ACPX engine runtime behavior", () => {
     } as never);
 
     expect(result.exitCode).toBe(0);
-    expect(result.summary).toBe("streamed hello");
     expect(logs).toContainEqual({
       stream: "stdout",
       text: `${JSON.stringify({
@@ -629,6 +627,7 @@ describe("shared ACPX engine runtime behavior", () => {
     });
   });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   it("pins the existing summary and tool-event behavior when no engine knobs are set", async () => {
     const root = await makeTempRoot();
@@ -944,6 +943,8 @@ describe("shared ACPX engine runtime behavior", () => {
     ]);
   });
 
+=======
+>>>>>>> bbcf75b5b (refactor(kimi): extract shared acpx/transcript changes to their own PR)
   it("captures per-run usage, cost deltas, and billing identity from the ACP runtime", async () => {
     const root = await makeTempRoot();
     const stateDir = path.join(root, "state");
